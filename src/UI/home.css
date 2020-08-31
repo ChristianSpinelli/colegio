@@ -4,4 +4,12 @@ section{
 
 section.content{
 	margin-left: 20px;
+	
+
 }
+
+div.column{
+	column-count: 2;
+	margin-bottom: 20px;
+}
+
