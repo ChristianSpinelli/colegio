@@ -6,6 +6,7 @@ import TelaProfessor from './UI/professor';
 import TelaMateria from './UI/materia';
 import TelaProva from './UI/prova';
 import TelaNota from './UI/nota';
+import TelaAno from './UI/ano';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 
@@ -22,6 +23,7 @@ export default class App extends React.Component{
 					<Route path='/materia' component={TelaMateria}/>
 					<Route path='/prova' component={TelaProva}/>
 					<Route path='/nota' component={TelaNota}/>
+					<Route path='/ano' component={TelaAno}/>
 				</Switch>
 			</BrowserRouter>
 						

@@ -3,7 +3,7 @@ import Card from 'react-bootstrap/Card';
 
 export default function Banner(props){
 	return(
-			<Card className="bg-dark text-white" style={{ width: '600px'}}>
+			<Card className="bg-dark text-white" style={{ width: '500px'}}>
   				<Card.Img src={props.image} alt="Card image" />
   				<Card.ImgOverlay>
     				<Card.Title>{props.title}</Card.Title>
