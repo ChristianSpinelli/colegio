@@ -3,7 +3,7 @@ import Header from '../Components/header';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
-import Table from 'react-bootstrap/Table';
+import BootstrapTable from 'react-bootstrap-table-next';
 import './telas.css';
 
 
@@ -14,11 +14,15 @@ export default class TelaAno extends React.Component{
 		super(props);
 		this.state = {
 			anos:[],
-			anoAtual:''
+			anoAtual:'',
+			rowSelected:0,
+			index:0
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+		this.handleSelect = this.handleSelect.bind(this);
+		this.handleDelete = this.handleDelete.bind(this);
 
 	}
 
@@ -26,10 +30,10 @@ export default class TelaAno extends React.Component{
 		if(localStorage.getItem("anos")){
 			const anos = JSON.parse(localStorage.getItem("anos"));
 			this.setState({
-				anos: anos
+				anos: anos,
+				index:anos[anos.length-1].id+1
 			})
 		}
-		
 	}
 
 
@@ -47,9 +51,24 @@ export default class TelaAno extends React.Component{
 			}
 			anos[anos.length] = ano;
 			localStorage.setItem("anos",JSON.stringify(anos));
+		}					
+	}
+
+	handleDelete(){
+		const anos = [...this.state.anos];
+		if(this.state.rowSelected >=0 && this.state.rowSelected < this.state.anos.length){
+			anos.splice(this.state.rowSelected, 1);
+			this.setState({
+				anos:anos
+			})
+			localStorage.setItem("anos", JSON.stringify(anos));
 		}
-		
-					
+	}
+
+	handleSelect(row){
+		this.setState({
+			rowSelected: row
+		});
 	}
 
 	render(){
@@ -62,35 +81,28 @@ export default class TelaAno extends React.Component{
 				<section class="content">
 					<Container class="form">
 						<h2>Cadastro de Ano</h2>
-						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.anos.length,ano:this.state.anoAtual})}>
+						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index,ano:this.state.anoAtual})}>
 							<Form.Group>
 								<Form.Label>Cadastre o Ano</Form.Label>
 								<Form.Control type="text" value={this.state.anoAtual} placeholder="Ano" onChange={this.handleChange} required/>
 							</Form.Group>
 							<div class="button">
-								<Button  type="submit" variant="dark">Confirmar</Button>
+								<Button  type="submit" variant="dark">Cadastrar</Button>
 							</div>
 						</Form>
 					</Container>
 
 					<Container class="tabela-ano">
 						<h2>Tabela de Anos</h2>
-						<Table striped bordered hover responsive>
-							<thead>
-								<tr>
-									<th>ID</th>
-									<th>Ano</th>
-								</tr>
-							</thead>
-							<tbody>
-									{this.state.anos.map( (value) =>(
-										<tr>
-											<td>{value.id}</td>
-											<td>{value.ano}</td>
-										</tr>
-									))}
-							</tbody>
-						</Table>
+						<BootstrapTable 
+						keyField='id' 
+						selectRow={{mode:'radio', style:{background:'red'}, 
+						onSelect:(row, isSelect, rowIndex, event) => {this.handleSelect(rowIndex)} }} 
+						data={ this.state.anos } 
+						columns={ [{dataField:'id', text:'ID'}, {dataField:'ano', text:"Ano"}] } />
+						<div class="button">
+							<Button variant="danger" onClick={this.handleDelete}>Deletar</Button>
+						</div>
 					</Container>
 				</section>
 			</React.Fragment>

@@ -23,17 +23,17 @@ export default class Home extends React.Component{
 										<Col><Banner image='./students grande.jpg' title='Cadastro de Alunos' url='/aluno'/></Col>
 									</div>
 									<div class='col'>
-										<Col><Banner image='./sala grande.jpg' title='Cadastro de Ano' url='/ano'/></Col>
-									</div>
+										<Col><Banner image='./professores grande.jpg' title='Cadastro de Professores' url='/professor'/></Col>
+									</div>									
 								</Row>
 								
 								
 								<Row>
 									<div class='col'>
-										<Col><Banner image='./professores grande.jpg' title='Cadastro de Professores' url='/professor'/></Col>
+										<Col><Banner image='./sala grande.jpg' title='Cadastro de Ano' url='/ano'/></Col>
 									</div>
 									<div class='col'>
-										<Col><Banner image='./materia grande.jpg' title='Cadastro de Matérias' url='/materia'/></Col>
+										<Col><Banner image='./turma medio.jpg' title='Cadastro de Turma' url='/turma'/></Col>
 									</div>
 								</Row>
 								
@@ -44,6 +44,12 @@ export default class Home extends React.Component{
 									</div>
 									<div class='col'>	
 										<Col><Banner image='./nota grande.jpg' title='Cadastro de Notas' url='/nota'/></Col>
+									</div>
+								</Row>
+
+								<Row>
+									<div class='col'>
+										<Col><Banner image='./materia grande.jpg' title='Cadastro de Matérias' url='/materia'/></Col>
 									</div>
 								</Row>
 								
