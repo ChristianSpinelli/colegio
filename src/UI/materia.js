@@ -3,8 +3,8 @@ import Header from '../Components/header';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import BootstrapTable from 'react-bootstrap-table-next';
 import './telas.css';
+import Table from '../Components/table';
 
 
 export default class TelaMateria extends React.Component{
@@ -27,10 +27,13 @@ export default class TelaMateria extends React.Component{
 	componentDidMount(){
 		if(localStorage.getItem("materias")){
 			const materias = JSON.parse(localStorage.getItem('materias'));
-			this.setState({
-				materias:materias,
-				index:materias[materias.length-1].id+1
-			})
+			if(materias.length > 0){
+				this.setState({
+					materias:materias,
+					index:materias[materias.length-1].id+1
+				})
+			}
+			
 		}
 	}
 
@@ -74,6 +77,7 @@ export default class TelaMateria extends React.Component{
 				</section>
 
 				<section class='content'>
+					<h2>Cadastro de Matérias</h2>
 					<Container class='form'>
 						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index, materia:this.state.materiaAtual}) }>
 							<Form.Group>
@@ -88,15 +92,13 @@ export default class TelaMateria extends React.Component{
 					</Container>
 
 					<Container class='table'>
-						<BootstrapTable 
-							keyField='id' 
-							data={this.state.materias} 
-							selectRow={{mode:'radio', style:{background:'red'},
-							onSelect:(row, isSelect, rowIndex, event) => {this.handleSelect(rowIndex)} }}
-							columns={ [{dataField:'id', text:'ID'}, {dataField:'materia', text:"Matérias"}]}/>
-							<div class="button">
-								<Button variant="danger" onClick={this.handleDelete}>Deletar</Button>
-							</div>
+						<h2>Tabela de Matérias</h2>
+						<Table 
+						data={this.state.materias} 
+						select={this.handleSelect}
+						columns={[{dataField:'id', text:'ID'}, {dataField:'materia', text:"Matérias"}]}
+						delete={this.handleDelete}>
+						</Table>
 					</Container>
 				</section>
 			</React.Fragment>

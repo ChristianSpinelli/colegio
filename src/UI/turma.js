@@ -3,7 +3,7 @@ import Header from '../Components/header';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import BootstrapTable from 'react-bootstrap-table-next';
+import Table from '../Components/table';
 import './telas.css';
 
 
@@ -104,6 +104,7 @@ export default class TelaTurma extends React.Component{
 					</section>
 
 					<section class="content">
+						<h2>Cadastro de Turmas</h2>
 						<Container class='form'>
 							<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index, ano:this.state.selectedAno, turma:this.state.turmaAtual})}>
 								<Form.Group>
@@ -125,16 +126,17 @@ export default class TelaTurma extends React.Component{
 						</Container>
 
 						<Container class='table'>
-							<BootstrapTable 
-							keyField='id' 
-							data={this.state.turmas} 
-							selectRow={{mode:'radio', style:{background:'red'},
-							onSelect:(row, isSelect, rowIndex, event) => {this.handleSelect(rowIndex)} }}
-							columns={ [{dataField:'id', text:'ID'}, {dataField:'ano.id', text:"ID Ano"},
-							{dataField:'ano.ano', text:"Ano"}, {dataField:'turma', text:'Turma'}]}/>
-							<div class="button">
-								<Button variant="danger" onClick={this.handleDelete}>Deletar</Button>
-							</div>
+							<h2>Tabela de Turmas</h2>
+							<Table
+							data={this.state.turmas}
+							columns={[
+								{dataField:'id', text:'ID'}, 
+								{dataField:'ano.id', text:"ID Ano"},
+								{dataField:'ano.ano', text:"Ano"}, 
+								{dataField:'turma', text:'Turma'}]}
+							select={this.handleSelect}
+							delete={this.handleDelete}>
+							</Table>
 						</Container>
 					</section>
 

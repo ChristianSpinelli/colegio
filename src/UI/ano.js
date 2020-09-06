@@ -3,7 +3,7 @@ import Header from '../Components/header';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
-import BootstrapTable from 'react-bootstrap-table-next';
+import Table from '../Components/table';
 import './telas.css';
 
 
@@ -94,15 +94,12 @@ export default class TelaAno extends React.Component{
 
 					<Container class="tabela-ano">
 						<h2>Tabela de Anos</h2>
-						<BootstrapTable 
-						keyField='id' 
-						selectRow={{mode:'radio', style:{background:'red'}, 
-						onSelect:(row, isSelect, rowIndex, event) => {this.handleSelect(rowIndex)} }} 
-						data={ this.state.anos } 
-						columns={ [{dataField:'id', text:'ID'}, {dataField:'ano', text:"Ano"}] } />
-						<div class="button">
-							<Button variant="danger" onClick={this.handleDelete}>Deletar</Button>
-						</div>
+						<Table 
+						data={this.state.anos} 
+						select={this.handleSelect}
+						columns={[{dataField:'id', text:'ID'}, {dataField:'ano', text:"Ano"}]}
+						delete={this.handleDelete}>
+						</Table>
 					</Container>
 				</section>
 			</React.Fragment>

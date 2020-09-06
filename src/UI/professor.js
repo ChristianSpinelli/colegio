@@ -3,7 +3,7 @@ import Header from '../Components/header';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import BootstrapTable from 'react-bootstrap-table-next';
+import Table from '../Components/table';
 
 
 export default class TelaProfessor extends React.Component{
@@ -109,8 +109,9 @@ export default class TelaProfessor extends React.Component{
 					<Header/>
 				</section>
 
-				<section class='content'>
+				<section class='content'>					
 					<Container class='form'>
+						<h2>Cadastro de Professores</h2>
 						<Form onSubmit={ this.handleSubmit.bind(this, 
 							{id:this.state.index, 
 							 nome:this.state.informations[0],
@@ -168,11 +169,9 @@ export default class TelaProfessor extends React.Component{
 					</Container>
 
 					<Container class='table'>
-						<BootstrapTable
-							keyField='id' 
-							data={this.state.professores} 
-							selectRow={{mode:'radio', style:{background:'red'},
-							onSelect:(row, isSelect, rowIndex, event) => {this.handleSelect(rowIndex)} }}
+						<h2>Tabela de Professores</h2>
+						<Table
+							data={this.state.professores}
 							columns={ [
 							{dataField:'id', text:'ID'}, 
 							{dataField:'nome', text:"Nome"},
@@ -183,12 +182,12 @@ export default class TelaProfessor extends React.Component{
 							{dataField:'turma.ano.id', text:"ID Ano"},
 							{dataField:'turma.ano.ano', text:"Ano"},
 							{dataField:'turma.id', text:"ID Turma"},
+							{dataField:'turma.turma', text:"Turma"},
 							{dataField:'nasc', text:"Data de Nascimento"},
-							{dataField:'cad', text:"Data de Cadastro"}
-							]}/>
-							<div class="button">
-								<Button variant="danger" onClick={this.handleDelete}>Deletar</Button>
-							</div>
+							{dataField:'cad', text:"Data de Cadastro"}]}
+							select={this.handleSelect}
+							delete={this.handleDelete}>
+						</Table>
 					</Container>
 				</section>
 
