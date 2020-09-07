@@ -10,6 +10,7 @@ import TelaAno from './UI/ano';
 import Operations from './UI/operations';
 import Cadastro from './UI/cadastro';
 import TelaAta from './UI/ata';
+import TelaRelatorio from './UI/relatorio';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 
@@ -30,6 +31,7 @@ export default class App extends React.Component{
 					<Route path='/operations' component={Operations}/>
 					<Route path='/cadastro' component={Cadastro}/>
 					<Route path='/ata' component={TelaAta}/>
+					<Route path='/relatorio' component={TelaRelatorio}/>
 				</Switch>
 			</BrowserRouter>
 						

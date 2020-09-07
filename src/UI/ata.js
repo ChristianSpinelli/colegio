@@ -12,9 +12,7 @@ export default class TelaAta extends React.Component{
 		this.state={
 			alunos:[],
 			turmas:[],
-			info:[],
-			rowSelected:'',
-			index:0
+			info:[]
 		}
 
 		this.handleChange = this.handleChange.bind(this);
