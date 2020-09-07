@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from '../Components/header';
 import Container from 'react-bootstrap/Container';
-import Table from '../Components/table';
 import Form from 'react-bootstrap/Form';
 import VisualTable from '../Components/visualizationTable';
 import './telas.css';
