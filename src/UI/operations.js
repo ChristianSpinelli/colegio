@@ -1,12 +1,12 @@
 import React from 'react';
 import Header from '../Components/header';
-import Banner from '../Components/banner';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Banner from '../Components/banner';
 import './telas.css';
 
-export default class Home extends React.Component{
+export default class Operations extends React.Component{
 	render(){
 		return(
 			<React.Fragment>
@@ -14,15 +14,20 @@ export default class Home extends React.Component{
 					<Header/>
 				</section>
 
-				<section class='content'>
-					<Container class='grid'>
+				<section class ='content'>
+					<Container>
 						<Row>
 							<div class='col'>
-								<Col><Banner image='./registro grande.jpg' title='Cadastro' url='/cadastro'/></Col>
+								<Col><Banner image='./boletim grande.jpg' title='Boletim' url='/boletim'/></Col>
 							</div>
 							<div class='col'>
-								<Col><Banner image='./operacoes grande.jpg' title='Operações' url='/operations'/></Col>
+								<Col><Banner image='./ata grande.jpg' title='Ata Geral' url='/ata'/></Col>
 							</div>									
+						</Row>
+						<Row>
+							<div class='col'>
+								<Col><Banner image='./relatorio grande.jpg' title='Relatório Geral' url='/relatorio'/></Col>
+							</div>								
 						</Row>
 					</Container>
 				</section>

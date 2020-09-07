@@ -2,3 +2,16 @@ h2, div.button{
 	text-align: center;
 	margin: 20px;
 }
+
+section{
+	margin-bottom: 20px;
+}
+
+section.content{
+	margin-left: 20px;
+	margin-bottom: 20px;	
+}
+
+div.col{
+	margin-bottom: 20px;
+}

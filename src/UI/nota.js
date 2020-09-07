@@ -96,7 +96,7 @@ export default class TelaNota extends React.Component{
 			notas = JSON.parse(localStorage.getItem('notas'));
 		}
 		if(nota.aluno===undefined){
-			if(this.state.alunoDefault != ''){
+			if(this.state.alunoDefault !== ''){
 				nota.aluno = this.state.alunoDefault;
 			}else{
 				nota.aluno = this.state.alunos[0];
