@@ -13,7 +13,9 @@ export default class TelaMateria extends React.Component{
 		super(props);
 		this.state = {
 			materias:[],
-			materiaAtual:'',
+			form:{
+				materia:''
+			},
 			rowSelected:0,
 			index:0
 		}
@@ -24,7 +26,7 @@ export default class TelaMateria extends React.Component{
 		this.handleDelete = this.handleDelete.bind(this);
 	}
 
-	componentDidMount(){
+	componentWillMount(){
 		if(localStorage.getItem("materias")){
 			const materias = JSON.parse(localStorage.getItem('materias'));
 			if(materias.length > 0){
@@ -39,15 +41,12 @@ export default class TelaMateria extends React.Component{
 
 	handleChange(event){
 		this.setState({
-			materiaAtual: event.target.value
+			form:{...this.state.form, materia: event.target.value}
 		})
 	}
 
 	handleSubmit(materia){
-		let materias = [];
-		if(localStorage.getItem("materias")){
-			materias = JSON.parse(localStorage.getItem("materias"));
-		}
+		let materias = this.state.materias;
 		materias[materias.length] = materia;
 		localStorage.setItem("materias", JSON.stringify(materias));
 	}
@@ -79,7 +78,7 @@ export default class TelaMateria extends React.Component{
 				<section class='content'>
 					<h2>Cadastro de Matérias</h2>
 					<Container class='form'>
-						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index, materia:this.state.materiaAtual}) }>
+						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index, materia:this.state.form.materia}) }>
 							<Form.Group>
 								<Form.Label>Cadastre a matéria</Form.Label>
 								<Form.Control required type="text" placeholder="Matéria" value={this.state.materiaAtual} onChange={this.handleChange}>									

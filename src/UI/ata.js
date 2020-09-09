@@ -11,7 +11,10 @@ export default class TelaAta extends React.Component{
 		this.state={
 			alunos:[],
 			turmas:[],
-			info:[]
+			form:{
+				selectedTurma:''
+			},
+			ata:[]
 		}
 
 		this.handleChange = this.handleChange.bind(this);
@@ -36,13 +39,13 @@ export default class TelaAta extends React.Component{
 				}
 			}
 
-			if(this.state.info[0] === undefined){
-				let info = [...this.state.info];
-				info[0] = turmas[0];
-				let turma = turmas[0].ano.ano+" "+turmas[0].turma;
-				info[1] = alunos.filter(aluno => aluno.turma.ano.ano+" "+aluno.turma.turma === turma);
+			if(this.state.form.selectedTurma === ''){
+				let selectedTurma = turmas[0];
+				let ata = alunos.filter( 
+					aluno => aluno.turma.ano.ano+" "+aluno.turma.turma === selectedTurma.ano.ano+" "+selectedTurma.turma);
 				this.setState({
-					info:info
+					form:{selectedTurma:selectedTurma},
+					ata:ata
 				})
 			}
 			
@@ -50,12 +53,21 @@ export default class TelaAta extends React.Component{
 
 	}
 
+	componentDidMount(){
+		//mensagem alerta
+		if(this.state.alunos.length <= 0 || this.state.turmas.length <= 0){
+			let alerta = document.getElementById('alerta');
+			alerta.innerText = "Cadastre Alunos, Anos e Turmas para verificar a Ata de uma Turma";
+		}
+	}
+
 	handleChange(event){
-		let info = [...this.state.info];
-		info[0] = this.state.turmas.filter(turma => turma.ano.ano+" "+turma.turma === event.target.value)[0];
-		info[1] = this.state.alunos.filter(aluno => aluno.turma.ano.ano+" "+aluno.turma.turma === event.target.value);
+		let form = this.state.form;
+		form.selectedTurma = this.state.turmas.filter(turma => turma.ano.ano+" "+turma.turma === event.target.value)[0];
+		let ata = this.state.alunos.filter(aluno => aluno.turma.ano.ano+" "+aluno.turma.turma === event.target.value);
 		this.setState({
-			info:info
+			form:form,
+			ata:ata
 		})
 	}
 
@@ -71,6 +83,7 @@ export default class TelaAta extends React.Component{
 				<section class='content'>
 					<Container class='form'>
 						<h2>Ata de alunos</h2>
+						<h6 id='alerta'></h6>
 						<Form>	
 							<Form.Group>
 								<Form.Label>Selecione a turma:</Form.Label>
@@ -83,16 +96,14 @@ export default class TelaAta extends React.Component{
 						</Form>
 					</Container>
 					<Container class='table'>
-						<h2>Lista de alunos do {this.state.info[0].ano.ano} {this.state.info[0].turma}</h2>
+						<h2 id='alunos'>Lista de alunos</h2>
 						<VisualTable
-							data={this.state.info[1]}
+							data={this.state.ata}
 							columns={[
 								{dataField:'id', text:"ID"},
 								{dataField:'nome', text:"Nome"},
 								{dataField:'mat', text:"Nº de Matrícula"},
-								{dataField:'turma.ano.id', text:"ID Ano"},
 								{dataField:'turma.ano.ano', text:"Ano"},
-								{dataField:'turma.id', text:"ID Turma"},
 								{dataField:'turma.turma', text:"Turma"},
 								{dataField:'end', text:"Endereço"},
 								{dataField:'pais', text:"Pais"},

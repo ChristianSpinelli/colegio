@@ -99,15 +99,20 @@ export default class TelaRelatorio extends React.Component{
 			
 			count = 0;
 			result = 0;
-		}
-
-		
-		
+		}		
 
 		this.setState({
 			mediasAno:mediasAno,
 			mediasTurma:mediasTurma
 		})
+	}
+
+	componentDidMount(){
+		//mensagem alerta
+		if(this.state.turmas.length <=0 || this.state.anos.length <= 0 || this.state.notas.length <= 0 ){
+			let alerta = document.getElementById('alerta');
+			alerta.innerText = "Cadastre Anos, Turmas, Alunos, Professores, Provas e Notas para poder ver o Relatório Geral";
+		}
 	}
 
 
@@ -121,10 +126,10 @@ export default class TelaRelatorio extends React.Component{
 				<section class='content'>
 					<Container class='table-anos'>
 						<h2>Tabela de Média por Ano</h2>
+						<h6 id='alerta'></h6>
 						<VisualTable
 							data={this.state.mediasAno}
 							columns={[
-								{dataField:'ano.id', text:'ID Ano'},
 								{dataField:'ano.ano', text:'Ano'},
 								{dataField:'count', text:'Quantidade de Notas'},
 								{dataField:'media', text:'Média'}]}>
@@ -135,9 +140,7 @@ export default class TelaRelatorio extends React.Component{
 						<VisualTable
 							data={this.state.mediasTurma}
 							columns={[
-								{dataField:'turma.ano.id', text:'ID Ano'},
 								{dataField:'turma.ano.ano', text:'Ano'},
-								{dataField:'turma.id', text:'ID Turma'},
 								{dataField:'turma.turma', text:'Turma'},
 								{dataField:'count', text:'Quantidade de Notas'},
 								{dataField:'media', text:'Média'}]}>

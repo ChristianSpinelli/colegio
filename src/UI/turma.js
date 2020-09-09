@@ -15,66 +15,76 @@ export default class TelaTurma extends React.Component{
 		this.state = {
 			anos:[],
 			turmas:[],
-			turmaAtual:'',
-			selectedAno:'',
+			form:{
+				selectedAno:'',
+				turma:''
+			},
 			rowSelected:0,
 			index:0
 		}
 
-		this.handleChangeTurma = this.handleChangeTurma.bind(this);
+		
 		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleChangeAno = this.handleChangeAno.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 		this.handleSelect = this.handleSelect.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 
 	}
 
-	componentDidMount(){
+	componentWillMount(){
+		//carregar anos cadastrados
 		if(localStorage.getItem("anos")){
 			const anos = JSON.parse(localStorage.getItem("anos"));
 			this.setState({
 				anos: anos	
 			})
-
-			if(this.state.selectedAno===''){
+			//inicializando o ano selecionado para o primeiro ano, caso não tenha ano selecionado
+			if(this.state.form.selectedAno === ''){
 				this.setState({
-					selectedAno:anos[0]
+					form:{...this.state.form, selectedAno:anos[0]}
 				})
 			}
 		}
 
+		//carregar turmas cadastradas
 		if(localStorage.getItem("turmas")){
 			const turmas = JSON.parse(localStorage.getItem("turmas"));
-			this.setState({
-				turmas:turmas,
-				index:turmas[turmas.length-1].id+1
-			})
+			if(turmas.length > 0){
+				this.setState({
+					turmas:turmas,
+					index:turmas[turmas.length-1].id+1
+				})
+			}
 		}
-
-
 	}
 
-	handleChangeTurma(event){
-		this.setState({
-			turmaAtual: event.target.value
-		})
+	componentDidMount(){
+		//se não houver anos cadastrados aparece mensagem de alerta e desabilita botão cadastrar
+		if(this.state.anos.length <= 0){
+			let txtAlerta = document.getElementById('alerta');
+			txtAlerta.innerText = 'Cadastre um ano para poder cadastrar uma turma';
+			let submit = document.getElementById('submit');
+			submit.disabled = true;
+		}
+		
 	}
 
-	handleChangeAno(event){
-		this.setState({
-			selectedAno: this.state.anos.filter( ano => ano.ano===event.target.value)[0]
-		})
+	handleChange(event, campo){
+		switch(campo){
+			case 'turma':
+				this.setState({form:{...this.state.form, turma:event.target.value}});
+				break;
+			case 'ano':
+				this.setState({form:{...this.state.form, selectedAno:this.state.anos.filter( ano => ano.ano===event.target.value)[0]}})
+				break;
+		}
 	}
+
 
 	handleSubmit(turma){
-		if(turma !== ""){
-			let turmas = [];
-			if(localStorage.getItem("turmas")){
-				turmas = JSON.parse(localStorage.getItem("turmas"));
-			}
-			turmas[turmas.length] = turma;
-			localStorage.setItem("turmas", JSON.stringify(turmas));
-		}
+		let turmas = this.state.turmas;
+		turmas[turmas.length] = turma;
+		localStorage.setItem("turmas", JSON.stringify(turmas));
 	}
 
 	handleSelect(row){
@@ -84,7 +94,7 @@ export default class TelaTurma extends React.Component{
 	}
 
 	handleDelete(){
-		const turmas =[...this.state.turmas];
+		const turmas = this.state.turmas;
 		if(this.state.rowSelected >=0 && this.state.rowSelected < this.state.turmas.length){
 			turmas.splice(this.state.rowSelected,1);
 			this.setState({
@@ -105,11 +115,12 @@ export default class TelaTurma extends React.Component{
 
 					<section class="content">
 						<h2>Cadastro de Turmas</h2>
+						<h6 id='alerta'></h6>
 						<Container class='form'>
-							<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index, ano:this.state.selectedAno, turma:this.state.turmaAtual})}>
+							<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index, ano:this.state.form.selectedAno, turma:this.state.form.turma})}>
 								<Form.Group>
 									<Form.Label>Selecione um ano</Form.Label>
-									<Form.Control as="select" onChange={this.handleChangeAno}>
+									<Form.Control as="select" onChange={(event) => this.handleChange(event,'ano')}>
 										{this.state.anos.map( (ano) => (
 											<option>{ano.ano}</option>
 										))}
@@ -117,10 +128,11 @@ export default class TelaTurma extends React.Component{
 								</Form.Group>
 								<Form.Group>
 									<Form.Label>Cadastre a Turma</Form.Label>
-									<Form.Control required type='text' placeholder='Turma' value={this.state.turmaAtual} onChange={this.handleChangeTurma}/>
+									<Form.Control required type='text' placeholder='Turma' value={this.state.turmaAtual} 
+									onChange={(event) => this.handleChange(event,'turma')}/>
 								</Form.Group>
 								<div class="button">
-									<Button  type="submit" variant="dark">Cadastrar</Button>
+									<Button id='submit' type="submit" variant="dark">Cadastrar</Button>
 								</div>
 							</Form>
 						</Container>
@@ -131,7 +143,6 @@ export default class TelaTurma extends React.Component{
 							data={this.state.turmas}
 							columns={[
 								{dataField:'id', text:'ID'}, 
-								{dataField:'ano.id', text:"ID Ano"},
 								{dataField:'ano.ano', text:"Ano"}, 
 								{dataField:'turma', text:'Turma'}]}
 							select={this.handleSelect}

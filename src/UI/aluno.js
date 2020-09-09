@@ -13,9 +13,17 @@ export default class TelaAluno extends React.Component{
 		this.state = {
 			alunos:[],
 			turmas:[],
-			informations:[],
+			form:{
+				nome:'',
+				matricula:'',
+				nascimento:'',
+				endereco:'',
+				pais:'',
+				observacoes:'',
+				selectedTurma:''
+			},
 			index:0,
-			defaultTurma:""
+			rowSelected:''
 		}
 
 		this.handleChange = this.handleChange.bind(this);
@@ -24,58 +32,93 @@ export default class TelaAluno extends React.Component{
 		this.handleDelete = this.handleDelete.bind(this);
 	}
 
-	componentDidMount(){
+	componentWillMount(){
+		//carregando turmas cadastradas
 		if(localStorage.getItem("turmas")){
 			const turmas = JSON.parse(localStorage.getItem("turmas"));
 			this.setState({
 				turmas:turmas,
-				defaultTurma:turmas[0]
 			})
+
+			//inicializando a turma selecionada para a primeira turma, caso não tenha turma selecionada
+			if(this.state.form.selectedTurma === ''){
+				this.setState({
+					form:{...this.state.form, selectedTurma:turmas[0]}
+				})
+			}
 		}
 
+		//carregando alunos cadastrados
 		if(localStorage.getItem("alunos")){
 			const alunos = JSON.parse(localStorage.getItem("alunos"));
-			this.setState({
-				alunos:alunos,
-				index:alunos[alunos.length-1].id+1
-			})
-
+			if(alunos.length > 0){
+				this.setState({
+					alunos:alunos,
+					index:alunos[alunos.length-1].id+1
+				})
+			}			
 		}
 	}
 
-	handleChange(event, position){
-		let informations = [...this.state.informations];
-		if(position < 6){
-			informations[position] = event.target.value;
-			
-		}else{
-			informations[position] = this.state.turmas.filter(turma => turma.ano.ano+" "+turma.turma === event.target.value)[0]
+	componentDidMount(){
+		//verifica se tem turmas e anos cadastrados para poder cadastrar o aluno em uma turma.
+		if(this.state.turmas.length <= 0){
+			let alerta = document.getElementById('alerta');
+			alerta.innerText = "Cadastre Anos e Turmas para poder cadastrar Alunos";
+			//desabilita botão de cadastrar
+			let submit = document.getElementById('submit');
+			submit.disabled = true;
 		}
-		this.setState({
-				informations:informations
-		})
+	}
+
+	handleChange(event, campo){
+		//inserindo os campos conforme o usuario preenche o formulario.
+		switch(campo){
+			case 'nome':
+				this.setState({form:{...this.state.form, nome:event.target.value}});
+				break;
+			case 'matricula':
+				this.setState({form:{...this.state.form, matricula:event.target.value}});
+				break;
+			case 'nascimento':
+				this.setState({form:{...this.state.form, nascimento: new Date(event.target.value)}});
+				break;
+			case 'endereco':
+				this.setState({form:{...this.state.form, endereco:event.target.value}});
+				break;
+			case 'pais':
+				this.setState({form:{...this.state.form, pais:event.target.value}});
+				break;
+			case 'observacoes':
+				this.setState({form:{...this.state.form, observacoes:event.target.value}});
+				break;
+			case 'turma':
+				//o campo turma é um objeto, então filtro na lista de turmas um objeto com o mesmo valor da turma selecionada
+				this.setState({form:{...this.state.form, 
+					selectedTurma:this.state.turmas.filter(turma => turma.ano.ano+" "+turma.turma === event.target.value)[0]}});
+				break;
+			default:
+				break;
+				
+		}
 	}
 
 	handleSubmit(aluno){
-		let alunos = [];
-		if(localStorage.getItem("alunos")){
-			alunos = JSON.parse(localStorage.getItem('alunos'));
-		}
-		if(aluno.turma === undefined){
-			aluno.turma = this.state.defaultTurma;
-		}
+		//insere o aluno informado na última posição e salva no banco de dados
+		let alunos = this.state.alunos;
 		alunos[alunos.length] = aluno;
-		localStorage.setItem('alunos', JSON.stringify(alunos));
+		localStorage.setItem('alunos', JSON.stringify(alunos));		
 	}
 
 	handleSelect(row){
+		//insere qual linha da tabela foi selecionada pelo usuario
 		this.setState({
 			rowSelected: row
 		});
 	}
 
 	handleDelete(){
-		const alunos = [...this.state.alunos];
+		const alunos = this.state.alunos;
 		if(this.state.rowSelected >=0 && this.state.rowSelected < this.state.alunos.length){
 			alunos.splice(this.state.rowSelected,1);
 			this.setState({
@@ -94,56 +137,63 @@ export default class TelaAluno extends React.Component{
 
 				<section class='content'>
 					<h2>Cadastro de Alunos</h2>
+					<h6 id='alerta'></h6>
 					<Container class='form'>
 						<Form onSubmit={this.handleSubmit.bind(this,
 							{id:this.state.index, 
-							nome:this.state.informations[0], 
-							mat:this.state.informations[1],
-							nasc:this.state.informations[2],
-							end:this.state.informations[3],
-							pais:this.state.informations[4],
-							obs:this.state.informations[5],
-							turma:this.state.informations[6] })}>
+							nome:this.state.form.nome, 
+							mat:this.state.form.matricula,
+							nasc:this.state.form.nascimento,
+							end:this.state.form.endereco,
+							pais:this.state.form.pais,
+							obs:this.state.form.observacoes,
+							turma:this.state.form.selectedTurma })}>
 							<Form.Group>
 								<Form.Label>Insira o nome:</Form.Label>
-								<Form.Control required type='text' placeholder="Nome" onChange={(event) => this.handleChange(event, 0)}>
+								<Form.Control required type='text' placeholder="Nome" 
+								onChange={(event) => this.handleChange(event,'nome')}>
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Insira número de matrícula:</Form.Label>
-								<Form.Control required type='number' placeholder="000-00" onChange={(event) => this.handleChange(event, 1)}>
+								<Form.Control required type='number' placeholder="000-00" 
+								onChange={(event) => this.handleChange(event,'matricula')}>
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Insira a data de nascimento:</Form.Label>
-								<Form.Control required type='date' onChange={(event) => this.handleChange(event, 2)}>
+								<Form.Control required type='date' 
+								onChange={(event) => this.handleChange(event,'nascimento')}>
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Insira o endereço:</Form.Label>
-								<Form.Control required type='text' placeholder='Nome da rua' onChange={(event) => this.handleChange(event, 3)}>
+								<Form.Control required type='text' placeholder='Nome da rua' 
+								onChange={(event) => this.handleChange(event,'endereco')}>
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Insira o nome dos pais ou responsáveis:</Form.Label>
-								<Form.Control required type='text' placeholder='Nome dos pais ou responsáveis' onChange={(event) => this.handleChange(event, 4)}>
+								<Form.Control required type='text' placeholder='Nome dos pais ou responsáveis' 
+								onChange={(event) => this.handleChange(event,'pais')}>
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Observações:</Form.Label>
-								<Form.Control required type='text' placeholder='Observações' onChange={(event) => this.handleChange(event, 5)}>
+								<Form.Control required type='text' placeholder='Observações' 
+								onChange={(event) => this.handleChange(event,'observacoes')}>
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Selecione o Ano e a turma</Form.Label>
-								<Form.Control as="select" onChange={(event) => this.handleChange(event, 6)}>
+								<Form.Control as="select" onChange={(event) => this.handleChange(event,'turma')}>
 									{this.state.turmas.map( turma =>(
 										<option>{turma.ano.ano} {turma.turma}</option>
 									))}
 								</Form.Control>
 							</Form.Group>
 							<div class="button">
-								<Button  type="submit" variant="dark">Cadastrar</Button>
+								<Button id='submit' type="submit" variant="dark">Cadastrar</Button>
 							</div>
 						</Form>
 					</Container>
@@ -156,9 +206,7 @@ export default class TelaAluno extends React.Component{
 						columns={[{dataField:'id', text:'ID'}, 
 							{dataField:'mat', text:"Nº de Matrícula"},
 							{dataField:'nome', text:"Aluno"},
-							{dataField:'turma.ano.id', text:"ID Ano"},
 							{dataField:'turma.ano.ano', text:"Ano"},
-							{dataField:'turma.id', text:"ID Turma"},
 							{dataField:'turma.turma', text:"Turma"},
 							{dataField:'nasc', text:"Nascimento"},
 							{dataField:'end', text:"Endereço"},

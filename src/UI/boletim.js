@@ -14,12 +14,13 @@ export default class TelaBoletim extends React.Component{
 			notas:[],
 			materias:[],
 			alunos:[],
-			selectedAluno:'',
+			form:{
+				selectedAluno:''
+			},
 			boletim:[]
 		}
 
 		this.handleChange = this.handleChange.bind(this);
-	
 	}
 
 	componentWillMount(){
@@ -57,41 +58,42 @@ export default class TelaBoletim extends React.Component{
 		if(localStorage.getItem('selectedAluno')){
 			let selectedAluno = JSON.parse(localStorage.getItem("selectedAluno"));
 			this.setState({
-				selectedAluno:selectedAluno
+				form:{...this.state.form, selectedAluno:selectedAluno}
 			})
 		}else{
-			let selectedAluno = [...this.state.selectedAluno];
+			let selectedAluno = this.state.selectedAluno;
 			selectedAluno = alunos[0];
 			this.setState({
-				selectedAluno:selectedAluno
+				form:{...this.state.form, selectedAluno:selectedAluno}
 			})
-		}
-
-		
+		}		
 	}
 
 	componentDidMount(){
-
-
 		let sum = 0;
 		let result = 0;
 		let count = 0;
 		let boletim = [];
-		console.log(this.state.selectedAluno);
+		//cria lista de médias por matéria
 		for(let i=0; i < this.state.materias.length; i++ ){
 			sum = this.state.notas.reduce((sum,nota) => {
 				if(nota.prova.materia.materia === this.state.materias[i].materia 
-					&& nota.aluno.nome === this.state.selectedAluno.nome){
+					&& nota.aluno.nome === this.state.form.selectedAluno.nome){
 					count++;
 					result = sum + parseInt(nota.nota,10);
+					
 				}
 				return result;
 			},0);
 
 			if(count>0){
+				
 				boletim[i] = {media:sum/count, materia:this.state.materias[i], count:count};
+						
 			}else{
-					boletim[i] ={media:0, materia:this.state.materias[i], count:0};
+				
+				boletim[i] ={media:0, materia:this.state.materias[i], count:0};
+				
 			}
 
 			count = 0;
@@ -101,6 +103,26 @@ export default class TelaBoletim extends React.Component{
 		this.setState({
 			boletim:boletim
 		})
+
+
+		//inserir nome do aluno no título de boletim
+		if(this.state.form.selectedAluno !== undefined){
+			let txtBoletim = document.getElementById('txtBoletim');
+			txtBoletim.innerText = "Boletim de "+this.state.form.selectedAluno.nome;
+		}
+
+		//mensagem alerta
+		if(this.state.alunos.length <= 0 || this.state.materias.length <= 0 || this.state.notas.length <= 0){
+			let alerta = document.getElementById('alerta');
+			alerta.innerText = 'Cadastre Alunos, Matérias e Notas para conferir o Boletim de um Aluno';
+		}
+
+		if(this.state.form.selectedAluno !== ''){
+			let selectAluno = document.getElementById('selectAluno');
+			selectAluno.value = this.state.form.selectedAluno.nome;
+		}
+
+	
 	}
 
 	handleChange(event){
@@ -119,10 +141,11 @@ export default class TelaBoletim extends React.Component{
 				<section class='content'>
 					<Container class='form'>
 						<h2>Tela de Boletim</h2>
+						<h6 id='alerta'></h6>
 						<Form>
 							<Form.Group>
 								<Form.Label>Selecione o Aluno:</Form.Label>
-								<Form.Control value={this.state.selectedAluno.nome} as='select' onChange={this.handleChange}>
+								<Form.Control id='selectAluno' as='select' onChange={this.handleChange}>
 									{this.state.alunos.map(aluno => (
 										<option>{aluno.nome}</option>
 									))}
@@ -131,14 +154,13 @@ export default class TelaBoletim extends React.Component{
 						</Form>
 					</Container>
 					<Container>
-						<h2>Boletim de {this.state.selectedAluno.nome}</h2>
-						<VisualTable
+						<h2 id='txtBoletim'>Boletim</h2>
+						<VisualTable id='table'
 							data={this.state.boletim}
 							columns={[
-								{dataField:'materia.id', text:"ID Matéria"},
 								{dataField:'materia.materia', text:"Matéria"},
-								{dataField:'count', text:"Quantidade de Notas"},
-								{dataField:'media', text:"Média"},]}>
+								{dataField:'count', text:'Quantidade de Notas'},
+								{dataField:'media', text:"Média"}]}>
 						</VisualTable>
 					</Container>
 				</section>

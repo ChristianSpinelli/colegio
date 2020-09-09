@@ -13,7 +13,11 @@ export default class TelaNota extends React.Component{
 			notas:[],
 			provas:[],
 			alunos:[],
-			info:[],
+			form:{
+				selectedProva:'',
+				selectedAluno:'',
+				nota:''
+			},
 			rowSelected:'',
 			alunoDefault:'',
 			index:0
@@ -27,30 +31,32 @@ export default class TelaNota extends React.Component{
 	}
 
 	componentWillMount(){
+		let provas = [];
 		if(localStorage.getItem("provas")){
-			const provas = JSON.parse(localStorage.getItem("provas"));
+			provas = JSON.parse(localStorage.getItem("provas"));
 			if(provas.length > 0){
 				this.setState({
 					provas:provas
 				})
-
-				if(this.state.info[0] === undefined){
-					let info = [...this.state.info];
-					info[0] = provas[0];
-					this.setState({
-						info:info
-					})
-				}
 			}
-		}			
-	}
+		}
 
-	componentDidMount(){
+		let alunos = []
 		if(localStorage.getItem("alunos")){
-			const alunos = JSON.parse(localStorage.getItem("alunos"));
+			alunos = JSON.parse(localStorage.getItem("alunos"));
 			if(alunos.length > 0){
 				this.setState({
 					alunos:alunos
+				})
+			}
+		}
+
+		//insere defaults
+		if(alunos.length > 0 && provas.length > 0){
+			if(this.state.form.selectedProva === '' 
+				&& this.state.form.selectedAluno === ''){
+				this.setState({
+					form:{...this.state.form, selectedProva:provas[0], selectedAluno:alunos[0]}
 				})
 			}
 		}
@@ -63,46 +69,45 @@ export default class TelaNota extends React.Component{
 					index:notas[notas.length-1].id+1
 				})
 			}
+		}				
+	}
+
+	componentDidMount(){
+		//mensagem alerta
+		if(this.state.provas.length <= 0 || this.state.alunos.length <= 0){
+			let alerta = document.getElementById('alerta');
+			alerta.innerText = "Cadastre Matérias, Anos, Turmas, Professores e Alunos para poder cadastrar Notas";
+			let submit = document.getElementById('submit');
+			submit.disabled = true;
 		}	
 	}
 
-	handleChange(event, position){
-		let info = [...this.state.info];
-		let alunoDefault = this.state.alunoDefault;
-		switch(position){
-			case 0:
-				info[position] = this.state.provas.filter
-				( prova => prova.materia.materia+" "+prova.turma.ano.ano +" "+prova.turma.turma === event.target.value)[0];
-				alunoDefault = this.state.alunos.filter
-				( aluno => aluno.turma.ano.ano+" "+aluno.turma.turma === info[position].turma.ano.ano+" "+info[position].turma.turma)[0];
+	handleChange(event, campo){
+		let form = this.state.form;
+		switch(campo){
+			case 'prova':
+				form.selectedProva = this.state.provas.filter( 
+					prova => prova.materia.materia+" "+prova.turma.ano.ano+" "+prova.turma.turma === event.target.value)[0];
+				form.selectedAluno = this.state.alunos.filter( 
+					aluno => aluno.turma.ano.ano+" "+aluno.turma.turma === 
+					form.selectedProva.turma.ano.ano+" "+form.selectedProva.turma.turma)[0];
 				break;
-			case 1:
-				info[position] = this.state.alunos.filter( aluno => aluno.nome === event.target.value)[0];
-				break;
+			case 'aluno':
+				form.selectedAluno = this.state.alunos.filter( aluno => aluno.nome === event.target.value)[0];
+			case 'nota':
+				form.nota = event.target.value;
 			default:
-				info[position] = event.target.value;
 				break;
 		}
+		
 		this.setState({
-			info:info,
-			alunoDefault:alunoDefault
+			form:form
 		})
 
 	}
 
 	handleSubmit(nota){
-		let notas =[];
-		if(localStorage.getItem("notas")){
-			notas = JSON.parse(localStorage.getItem('notas'));
-		}
-		if(nota.aluno===undefined){
-			if(this.state.alunoDefault !== ''){
-				nota.aluno = this.state.alunoDefault;
-			}else{
-				nota.aluno = this.state.alunos[0];
-			}
-			
-		}
+		let notas = this.state.notas;
 		notas[notas.length] = nota;
 		localStorage.setItem("notas", JSON.stringify(notas));
 	}
@@ -126,7 +131,7 @@ export default class TelaNota extends React.Component{
 
 	returnOptions(aluno){
 		if(aluno.turma.ano.ano+" "+aluno.turma.turma === 
-			this.state.info[0].turma.ano.ano+" "+this.state.info[0].turma.turma){
+			this.state.form.selectedProva.turma.ano.ano+" "+this.state.form.selectedProva.turma.turma){
 			return <option>{aluno.nome}</option>
 		}
 	}	
@@ -141,31 +146,33 @@ export default class TelaNota extends React.Component{
 				<section class='content'>
 					<Container class='form'>
 						<h2>Cadastro de Notas</h2>
+						<h6 id='alerta'></h6>
 						<Form onSubmit={this.handleSubmit.bind(this,
 							{id:this.state.index,
-							 prova:this.state.info[0],
-							 aluno:this.state.info[1],
-							 nota:this.state.info[2]})}>
+							 prova:this.state.form.selectedProva,
+							 aluno:this.state.form.selectedAluno,
+							 nota:this.state.form.nota})}>
 							<Form.Group>
 								<Form.Label>Selecione a Prova</Form.Label>
-								<Form.Control as='select' onChange={(event) => this.handleChange(event, 0)}>
+								<Form.Control as='select' onChange={(event) => this.handleChange(event, 'prova')}>
 									{this.state.provas.map( prova => (
 										<option>{prova.materia.materia} {prova.turma.ano.ano} {prova.turma.turma}</option>
 									))}
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
-								<Form.Label>Selecione o Aluno do {this.state.info[0].turma.ano.ano} {this.state.info[0].turma.turma}</Form.Label>
-								<Form.Control as='select' onChange={(event) => this.handleChange(event, 1)}>
+								<Form.Label>Selecione o Aluno</Form.Label>
+								<Form.Control as='select' onChange={(event) => this.handleChange(event, 'aluno')}>
 									{this.state.alunos.map(this.returnOptions)}
 								</Form.Control>
 							</Form.Group>
 							<Form.Group>
 								<Form.Label>Insira a nota do Aluno:</Form.Label>
-								<Form.Control required type='number' min={0} max={10} placeholder='Nota' onChange={(event) => this.handleChange(event, 2)}></Form.Control>
+								<Form.Control required type='number' min={0} max={10} placeholder='Nota' 
+								onChange={(event) => this.handleChange(event, 'nota')}></Form.Control>
 							</Form.Group>
 							<div class='button'>
-								<Button variant="dark" type='submit'>Cadastrar</Button>
+								<Button id='submit' variant="dark" type='submit'>Cadastrar</Button>
 							</div>
 						</Form>
 					</Container>
@@ -177,13 +184,9 @@ export default class TelaNota extends React.Component{
 						delete={this.handleDelete}
 						columns={[
 						{dataField:'id', text:'ID'}, 
-						{dataField:'prova.materia.id', text:"ID Matéria"},
 						{dataField:'prova.materia.materia', text:"Matéria"},
-						{dataField:'prova.turma.ano.id', text:"ID Ano"},
 						{dataField:'prova.turma.ano.ano', text:"Ano"},
-						{dataField:'prova.turma.id', text:"ID Turma"},
 						{dataField:'prova.turma.turma', text:"Turma"},
-						{dataField:'aluno.id', text:"ID Aluno"},
 						{dataField:'aluno.nome', text:"Aluno"},
 						{dataField:'nota', text:"Nota"}]}>
 						</Table>

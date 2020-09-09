@@ -14,7 +14,9 @@ export default class TelaAno extends React.Component{
 		super(props);
 		this.state = {
 			anos:[],
-			anoAtual:'',
+			form:{
+				ano:''
+			},
 			rowSelected:0,
 			index:0
 		};
@@ -26,36 +28,34 @@ export default class TelaAno extends React.Component{
 
 	}
 
-	componentDidMount(){
+	componentWillMount(){
+		//carregar anos cadastrados
 		if(localStorage.getItem("anos")){
 			const anos = JSON.parse(localStorage.getItem("anos"));
-			this.setState({
-				anos: anos,
-				index:anos[anos.length-1].id+1
-			})
+			if(anos.length > 0){
+				this.setState({
+					anos: anos,
+					index:anos[anos.length-1].id+1
+				})
+			}
 		}
 	}
 
 
 	handleChange(event){
 		this.setState({
-			anoAtual: event.target.value
+			form:{...this.state.form, ano: event.target.value}
 		});
 	}
 
 	handleSubmit(ano){
-		if(ano.ano !== ""){
-			let anos = [];
-			if(localStorage.getItem("anos")){
-				anos = JSON.parse(localStorage.getItem("anos"));		
-			}
-			anos[anos.length] = ano;
-			localStorage.setItem("anos",JSON.stringify(anos));
-		}					
+		let anos = this.state.anos;
+		anos[anos.length] = ano;
+		localStorage.setItem("anos",JSON.stringify(anos));		
 	}
 
 	handleDelete(){
-		const anos = [...this.state.anos];
+		const anos = this.state.anos;
 		if(this.state.rowSelected >=0 && this.state.rowSelected < this.state.anos.length){
 			anos.splice(this.state.rowSelected, 1);
 			this.setState({
@@ -81,10 +81,11 @@ export default class TelaAno extends React.Component{
 				<section class="content">
 					<Container class="form">
 						<h2>Cadastro de Ano</h2>
-						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index,ano:this.state.anoAtual})}>
+						<Form onSubmit={this.handleSubmit.bind(this,{id:this.state.index,ano:this.state.form.ano})}>
 							<Form.Group>
 								<Form.Label>Cadastre o Ano</Form.Label>
-								<Form.Control type="text" value={this.state.anoAtual} placeholder="Ano" onChange={this.handleChange} required/>
+								<Form.Control required type="text" value={this.state.form.ano} placeholder="Ano" 
+								onChange={this.handleChange}/>
 							</Form.Group>
 							<div class="button">
 								<Button  type="submit" variant="dark">Cadastrar</Button>
